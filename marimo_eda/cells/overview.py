@@ -13,6 +13,7 @@ def __():
     import marimo as mo
     import pandas as pd
     import altair as alt
+    alt.data_transformers.enable("vegafusion")
     return mo, pd, alt
 '''
  
@@ -31,6 +32,7 @@ def __(pd):
 def shape_cell(profile: dict) -> str:
     rows, cols = profile["shape"]
     dupes = profile["duplicates"]
+    title = profile["title"]
     return f'''\
 @app.cell
 def __(mo):

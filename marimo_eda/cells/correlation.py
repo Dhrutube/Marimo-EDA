@@ -15,7 +15,7 @@ def __(df, mo, alt):
     corr = df.corr(numeric_only=True, method="{method}").stack().reset_index()
     corr.columns = ["col1", "col2", "r"]
 
-    chart = alt.Chart(corr).mark_rect().encode(
+    _chart = alt.Chart(corr).mark_rect().encode(
         x=alt.X("col1:N", title=None),
         y=alt.Y("col2:N", title=None),
         color=alt.Color(
@@ -33,6 +33,6 @@ def __(df, mo, alt):
         width=400,
         height=400,
     )
-    chart
+    _chart
     return (corr,)
 '''

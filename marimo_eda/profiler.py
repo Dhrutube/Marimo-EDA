@@ -83,6 +83,7 @@ def profile_csv(path: pathlib.Path) -> dict:
     return {
         "df":               df,
         "shape":            df.shape,
+        "title":            path.name,
         "duplicates":       int(df.duplicated().sum()),
         "columns":          columns,
         "numeric_cols":     numeric_cols,

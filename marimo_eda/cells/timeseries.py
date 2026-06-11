@@ -25,8 +25,6 @@ def __(mo):
 
 @app.cell
 def __(df, alt):
-    import pandas as pd
-
     # Detect the correct Altair encoding type for the X axis
     _x_series = df["{x}"]
     if pd.api.types.is_datetime64_any_dtype(_x_series):
@@ -36,7 +34,7 @@ def __(df, alt):
     else:
         _x_type = "O"   # ordinal (e.g. month names, quarters)
 
-    chart = alt.Chart(df).mark_line(point=True).encode(
+    _chart = alt.Chart(df).mark_line(point=True).encode(
         alt.X(f"{x}:{{_x_type}}", title="{x}"),
         alt.Y("{y}:Q", title="{y}"),
         color={color_enc},
@@ -45,6 +43,6 @@ def __(df, alt):
             alt.Tooltip("{y}:Q", title="{y}"){color_tooltip},
         ],
     ).interactive().properties(title="{title}", width=600)
-    chart
-    return (chart,)
+    _chart
+    return (_chart,)
 '''

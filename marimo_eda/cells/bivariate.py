@@ -33,14 +33,14 @@ def __(mo):
 
 @app.cell
 def __(df, alt):
-    chart = alt.Chart(df).mark_point(opacity=0.6).encode(
+    _chart = alt.Chart(df).mark_point(opacity=0.6).encode(
         alt.X("{x}:Q", title="{x}"),
         alt.Y("{y}:Q", title="{y}"),
         color={color_enc},
         tooltip=[alt.Tooltip("{x}:Q"), alt.Tooltip("{y}:Q"){color_tooltip}],
     ).interactive().properties(title="{title}", width=500)
-    chart
-    return (chart,)
+    _chart
+    return (_chart,)
 '''
 
 
@@ -58,15 +58,15 @@ def __(mo):
 
 @app.cell
 def __(df, alt):
-    chart = alt.Chart(df).mark_bar().encode(
+    _chart = alt.Chart(df).mark_bar().encode(
         alt.X("{x}:N", title="{x}"),
         alt.Y("{y}:Q", title="{y}"),
         {x_offset}
         color={color_enc},
         tooltip=[alt.Tooltip("{x}:N"), alt.Tooltip("{y}:Q")],
     ).properties(title="{title}", width=500)
-    chart
-    return (chart,)
+    _chart
+    return (_chart,)
 '''
 
 
@@ -85,14 +85,14 @@ def __(mo):
 
 @app.cell
 def __(df, alt):
-    chart = alt.Chart(df).mark_line().encode(
+    _chart = alt.Chart(df).mark_line().encode(
         alt.X("{x}:{x_type}", title="{x}"),
         alt.Y("{y}:Q", title="{y}"),
         color={color_enc},
         tooltip=[alt.Tooltip("{x}:{x_type}"), alt.Tooltip("{y}:Q"){color_tooltip}],
     ).interactive().properties(title="{title}", width=500)
-    chart
-    return (chart,)
+    _chart
+    return (_chart,)
 '''
 
 

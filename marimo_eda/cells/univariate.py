@@ -100,7 +100,6 @@ def __(mo):
 
 @app.cell
 def __(df, alt):
-    import pandas as pd
     _df = df[["{column}"]].reset_index().rename(columns={{"index": "row"}})
     chart = alt.Chart(_df).mark_line().encode(
         alt.X("row:Q", title="Row index"),
@@ -124,7 +123,6 @@ def __(mo):
 
 @app.cell
 def __(df, alt):
-    import pandas as pd
     counts = df["{column}"].value_counts().reset_index()
     counts.columns = ["{column}", "count"]
     chart = alt.Chart(counts).mark_bar().encode(
@@ -147,7 +145,6 @@ def __(mo):
 
 @app.cell
 def __(df, alt):
-    import pandas as pd
     counts = df["{column}"].value_counts().reset_index()
     counts.columns = ["{column}", "count"]
     chart = alt.Chart(counts).mark_arc().encode(
