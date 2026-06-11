@@ -144,7 +144,7 @@ def _prompt_timeseries(df: pd.DataFrame) -> dict | None:
 
     # X axis — prefer datetime columns but allow any column
     if datetime_cols:
-        x_choices = datetime_cols + questionary.Separator() + [c for c in df.columns if c not in datetime_cols]
+        x_choices = datetime_cols + [questionary.Separator()] + [c for c in df.columns if c not in datetime_cols]
     else:
         questionary.print(
             "No datetime columns detected. You can still pick any column as the time axis "
