@@ -16,6 +16,7 @@ def timeseries_cell(x: str, y: str, color: str) -> str:
 
     return f'''\
 
+
 @app.cell
 def __(mo):
     mo.md("## Time Series — `{y}` over `{x}`")

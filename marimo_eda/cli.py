@@ -31,6 +31,7 @@ def _pick_column(df: pd.DataFrame, label: str = "Select a column:") -> str | Non
         choices=list(df.columns),
     ).ask()
 
+
 def _prompt_univariate(df: pd.DataFrame) -> dict | None:
     """Prompt for a column and chart type."""
     col = _pick_column(df)
@@ -98,6 +99,7 @@ def _prompt_bivariate(df: pd.DataFrame) -> dict | None:
         "color": color_col,
     }
 
+
 def _prompt_correlation(df: pd.DataFrame) -> dict | None:
     """Prompt for correlation."""
     numeric_cols = df.select_dtypes("number").columns.tolist()
@@ -113,6 +115,7 @@ def _prompt_correlation(df: pd.DataFrame) -> dict | None:
         return None
 
     return {"type": "correlation", "method": method}
+
 
 def _prompt_timeseries(df: pd.DataFrame) -> dict | None:
     """
@@ -165,6 +168,7 @@ def _prompt_timeseries(df: pd.DataFrame) -> dict | None:
         "color": color_col,
     }
 
+
 def _prompt_run(df: pd.DataFrame) -> list[dict]:
     """
     Main loop. Returns a list of analysis spec dicts, e.g.:
@@ -203,6 +207,7 @@ def _prompt_run(df: pd.DataFrame) -> list[dict]:
 
     return analyses
 
+
 # Let user decide path
 def _ask_output_path(csv_path: pathlib.Path) -> pathlib.Path:
     """Ask where to save the notebook."""
@@ -226,6 +231,7 @@ def _ask_output_path(csv_path: pathlib.Path) -> pathlib.Path:
         directory = default_dir
 
     return pathlib.Path(directory).expanduser() / filename
+
 
 def main() -> None:
     # Parse argument

@@ -3,7 +3,6 @@ import pathlib
 import pandas as pd
 
 # Column kind detection and parsing
-
 def _col_kind(series: pd.Series) -> str:
     if pd.api.types.is_numeric_dtype(series):
         return "numeric"
@@ -30,6 +29,7 @@ def _try_parse_datetime(df: pd.DataFrame) -> pd.DataFrame:
             except (ValueError, TypeError):
                 pass
     return df
+
 
 def profile_csv(path: pathlib.Path) -> dict:
     """
@@ -90,6 +90,7 @@ def profile_csv(path: pathlib.Path) -> dict:
         "datetime_cols":    datetime_cols,
     }
 
+
 def _safe_float(value: object) -> float | None:
     """Safety wrapper for converting ydata's stat values to floats, since DataFrame has 'object' type."""
     try:
@@ -97,8 +98,8 @@ def _safe_float(value: object) -> float | None:
     except (TypeError, ValueError):
         return None
     
-# Print minimal summary in terminal
 
+# Print minimal summary in terminal
 def print_summary(profile: dict) -> None:
     """
     Print a human-readable summary of the profile to stdout.
