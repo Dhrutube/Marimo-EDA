@@ -3,33 +3,28 @@ cells/missing.py — missing values cell.
 """
 
 
-def missing_heatmap_cell() -> str:
+def missing_summary_cell() -> str:
     return '''\
 @app.cell
 def __(mo):
-    mo.md("## Missing Value Heatmap")
+    mo.md("## Missing Value Summary")
     return
 
 
 @app.cell
-def __(df, mo, alt):
-    _missing = df.isnull().mean().mul(100).reset_index()
-    _missing.columns = ["column", "pct_missing"]
-    _missing = _missing[_missing["pct_missing"] > 0].sort_values("pct_missing", ascending=False)
-
-    if _missing.empty:
-        mo.callout(mo.md("No missing values found in this dataset."), kind="success")
+def __(df, mo):
+    _missing = pd.DataFrame({
+        "column": df.columns,
+        "null_count": df.isnull().sum().values,
+        "null_pct": (df.isnull().mean() * 100).round(1).values,
+    })
+    _missing_filtered = _missing[_missing["null_count"] > 0].reset_index(drop=True)
+    if _missing_filtered.empty:
+        mo.callout(mo.md("✅ No missing values found in this dataset."), kind="success")
     else:
-        _chart = alt.Chart(_missing).mark_bar().encode(
-            x=alt.X("pct_missing:Q", title="% Missing"),
-            y=alt.Y("column:N", sort="-x", title="Column"),
-            color=alt.condition(
-                alt.datum.pct_missing > 5,
-                alt.value("crimson"),
-                alt.value("steelblue"),
-            ),
-            tooltip=["column", alt.Tooltip("pct_missing:Q", format=".1f", title="% Missing")],
-        ).properties(title="Missing Values by Column", width=500)
-        _chart
-    return (_missing,)
+        mo.vstack([
+            mo.md(f"**{len(_missing_filtered)} column(s) have missing values:**"),
+            _missing_filtered,
+        ])
+    return
 '''
