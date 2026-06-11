@@ -164,3 +164,41 @@ def _prompt_timeseries(df: pd.DataFrame) -> dict | None:
         "y": y_col,
         "color": color_col,
     }
+
+def _prompt_run(df: pd.DataFrame) -> list[dict]:
+    """
+    Main loop. Returns a list of analysis spec dicts, e.g.:
+      [
+        {"type": "univariate", "chart": "Histogram", "column": "revenue"},
+        {"type": "correlation", "method": "pearson"},
+      ]
+    """
+    analyses: list[dict] = []
+
+    while True:
+        choice = questionary.select(
+            "What would you like to add to your notebook?",
+            choices=MAIN_MENU_CHOICES,
+        ).ask()
+
+        if choice is None or choice == "Done — generate notebook":
+            break
+
+        spec: dict | None = None
+
+        if choice == "Univariate Analysis":
+            spec = _prompt_univariate(df)
+        elif choice == "Bivariate Analysis":
+            spec = _prompt_bivariate(df)
+        elif choice == "Time Series Analysis":
+            spec = _prompt_timeseries(df)
+        elif choice == "Missing Value Report":
+            spec = {"type": "missing"}
+        elif choice == "Correlation Heatmap":
+            spec = _prompt_correlation(df)
+
+        if spec is not None:
+            analyses.append(spec)
+        print()
+
+    return analyses
