@@ -61,7 +61,7 @@ def _render_cell(spec: dict) -> str:
     if t == "missing":
         return missing_heatmap_cell()
     if t == "correlation":
-        return correlation_cell(method=spec["method"])
+        return correlation_cell(method=spec["method"], columns=spec["columns"])
 
     # Unknown spec type — emit a comment cell so the notebook still runs
     return f'''\

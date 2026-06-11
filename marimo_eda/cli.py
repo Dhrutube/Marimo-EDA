@@ -313,6 +313,8 @@ def main() -> None:
 
     print(f"\nNotebook written to {output_path}")
     print("\nTo open your notebook run:")
+    print(f"   marimo edit {output_path}\n")
+    print("\nTo open your report run:")
     print(f"   marimo run {output_path}\n")
     print("Dependencies needed in that environment:")
     print("   pip install marimo pandas altair\n")

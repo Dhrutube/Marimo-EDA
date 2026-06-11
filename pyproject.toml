@@ -9,7 +9,11 @@ dependencies = [
     "marimo>=0.23.9",
     "pandas>=2.3.3",
     "questionary>=2.1.1",
+    "scipy>=1.15.3"
 ]
 
 [project.scripts]
 marimo-eda = "marimo_eda.cli:main"
+
+[tool.marimo.runtime]
+output_max_bytes = 10_000_000
