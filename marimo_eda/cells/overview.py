@@ -80,7 +80,6 @@ def __(df, mo):
  
 @app.cell
 def __(df, mo):
-    import pandas as pd
     desc = df.describe(include="all").reset_index()
     desc = desc.rename(columns={"index": "stat"})
     mo.table(desc)
@@ -98,7 +97,6 @@ def __(df, mo):
  
 @app.cell
 def __(df, mo):
-    import pandas as pd
     missing = pd.DataFrame({
         "column": df.columns,
         "null_count": df.isnull().sum().values,

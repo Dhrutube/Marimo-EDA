@@ -13,7 +13,6 @@ def __(mo):
 
 @app.cell
 def __(df, mo, alt):
-    import pandas as pd
     missing = df.isnull().mean().mul(100).reset_index()
     missing.columns = ["column", "pct_missing"]
     missing = missing[missing["pct_missing"] > 0].sort_values("pct_missing", ascending=False)

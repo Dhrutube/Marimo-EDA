@@ -116,7 +116,7 @@ def print_summary(profile: dict) -> None:
     print("----" * len(header))
 
     for col, meta in columns.items():
-        col_display = col if len(col) <= 28 else col[:27] + "..."
+        col_display = col
         print(
             f"{col_display:<30} "
             f"{meta['dtype']:<12} "
@@ -136,7 +136,7 @@ def print_summary(profile: dict) -> None:
         # Header row
         print(f"{'':30}", end="")
         for col in numeric_cols:
-            label = col if len(col) <= col_w - 1 else col[: col_w - 2] + "..."
+            label = col
             print(f"{label:>{col_w}}", end="")
         print()
         print("─" * (30 + col_w * len(numeric_cols)))
