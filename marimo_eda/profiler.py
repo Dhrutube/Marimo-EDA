@@ -63,7 +63,7 @@ def profile_csv(path: pathlib.Path) -> dict:
             "null_count": int(series.isna().sum()),
             "null_pct":   round(series.isna().mean() * 100, 1),
             "unique":     int(series.nunique(dropna=True)),
-            # numeric fields — filled below if applicable
+            # numeric fields - filled below if applicable
             "mean":  _safe_float(series.mean()) if kind == "numeric" else None,
             "std":   _safe_float(series.std()) if kind == "numeric" else None,
             "min":   _safe_float(series.min()) if kind == "numeric" else None,
@@ -71,7 +71,7 @@ def profile_csv(path: pathlib.Path) -> dict:
             "p50":   _safe_float(series.quantile(.50)) if kind == "numeric" else None,
             "p75":   _safe_float(series.quantile(.75)) if kind == "numeric" else None,
             "max":   _safe_float(series.max()) if kind == "numeric" else None,
-            # categorical fields — filled below if applicable
+            # categorical fields - filled below if applicable
             "top_values": {str(k): int(v) for k, v in series.value_counts().head(10).items()} if kind == "categorical" else {},
         }
         columns[col] = entry
@@ -135,7 +135,7 @@ def print_summary(profile: dict) -> None:
         # Header row
         print(f"{'':30}", end="")
         for col in numeric_cols:
-            label = col if len(col) <= col_w - 1 else col[: col_w - 2] + "…"
+            label = col if len(col) <= col_w - 1 else col[: col_w - 2] + "..."
             print(f"{label:>{col_w}}", end="")
         print()
         print("─" * (30 + col_w * len(numeric_cols)))
@@ -144,7 +144,7 @@ def print_summary(profile: dict) -> None:
             print(f"{stat:<30}", end="")
             for col in numeric_cols:
                 val = profile["columns"][col][stat]
-                cell = f"{val:>{col_w}.2f}" if val is not None else f"{'—':>{col_w}}"
+                cell = f"{val:>{col_w}.2f}" if val is not None else f"{'-':>{col_w}}"
                 print(cell, end="")
             print()
 
