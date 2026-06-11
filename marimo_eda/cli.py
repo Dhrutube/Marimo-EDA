@@ -208,7 +208,6 @@ def _prompt_run(df: pd.DataFrame) -> list[dict]:
             spec = {"type": "missing"}
         elif choice == "Correlation Heatmap":
             spec = _prompt_correlation(df)
-
         if spec is not None:
             analyses.append(spec)
             label = _describe_spec(spec)
@@ -234,7 +233,7 @@ def _describe_spec(spec: dict) -> str:
         color_note = f" grouped by `{spec['color']}`" if spec["color"] != "None" else ""
         return f"Line Plot — `{spec['x']}` vs `{spec['y']}`{color_note}"
     if t == "missing":
-        return {"type": "missing"}
+        return "Missing Value Report"
     return t
 
 
