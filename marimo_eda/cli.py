@@ -203,6 +203,30 @@ def _prompt_run(df: pd.DataFrame) -> list[dict]:
 
     return analyses
 
+# Let user decide path
+def _ask_output_path(csv_path: pathlib.Path) -> pathlib.Path:
+    """Ask where to save the notebook."""
+    default_name = csv_path.stem + "_eda.py"
+
+    filename = questionary.text(
+        "Output filename:",
+        default=default_name,
+    ).ask()
+    if not filename:
+        filename = default_name
+    if not filename.endswith(".py"):
+        filename += ".py"
+
+    default_dir = str(pathlib.Path.home() / "Downloads")
+    directory = questionary.text(
+        "Output directory:",
+        default=default_dir,
+    ).ask()
+    if not directory:
+        directory = default_dir
+
+    return pathlib.Path(directory).expanduser() / filename
+
 def main() -> None:
     # Parse argument
     if len(sys.argv) < 2:
@@ -239,8 +263,9 @@ def main() -> None:
         print("No analyses selected — nothing to write. Exiting.")
         sys.exit(0)
 
+    # Ask where to save
     print()
-    output_path = pathlib.Path.home() / "Downloads" / (csv_path.stem + "_eda.py")
+    output_path = _ask_output_path(csv_path)
 
     # Build and export Marimo notebook
     output_path.parent.mkdir(parents=True, exist_ok=True)
@@ -255,4 +280,4 @@ def main() -> None:
     print("\nTo open your notebook run:")
     print(f"   marimo edit {output_path}\n")
     print("Dependencies needed in that environment:")
-    print("   pip install marimo pandas altair ydata-profiling\n")
+    print("   pip install marimo pandas altair\n")
