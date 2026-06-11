@@ -203,6 +203,8 @@ def _prompt_run(df: pd.DataFrame) -> list[dict]:
 
         if spec is not None:
             analyses.append(spec)
+            label = _describe_spec(spec)
+            questionary.print(f"✔ Added: {label}", style="fg:green")
         print()
 
     return analyses
