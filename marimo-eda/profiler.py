@@ -118,3 +118,58 @@ def _safe_float(value: object) -> float | None:
         return round(float(value), 4)  # type: ignore[arg-type]
     except (TypeError, ValueError):
         return None
+    
+# Print minimal summary in terminal
+
+def print_summary(profile: dict) -> None:
+    """
+    Print a human-readable summary of the profile to stdout.
+    """
+    rows, cols = profile["shape"]
+    dupes = profile["duplicates"]
+    columns = profile["columns"]
+
+    print(f"{rows:,} rows * {cols} columns   ({dupes:,} duplicate rows)\n")
+
+    # Column summary table
+    header = f"{'COLUMN':<30} {'TYPE':<12} {'KIND':<12} {'NON-NULL':>9} {'MISSING%':>9} {'UNIQUE':>8}"
+    print(header)
+    print("----" * len(header))
+
+    for col, meta in columns.items():
+        col_display = col if len(col) <= 28 else col[:27] + "..."
+        print(
+            f"{col_display:<30} "
+            f"{meta['dtype']:<12} "
+            f"{meta['kind']:<12} "
+            f"{meta['non_null']:>9,} "
+            f"{meta['null_pct']:>8.1f}% "
+            f"{meta['unique']:>8,}"
+        )
+
+    # ── Numeric stats table ────────────────────────────────────────────────
+    numeric_cols = profile["numeric_cols"]
+    if numeric_cols:
+        print("\nNUMERIC STATS")
+        stat_keys = ["mean", "std", "min", "p25", "p50", "p75", "max"]
+        col_w = 12
+
+        # Header row
+        print(f"{'':30}", end="")
+        for col in numeric_cols:
+            label = col if len(col) <= col_w - 1 else col[: col_w - 2] + "…"
+            print(f"{label:>{col_w}}", end="")
+        print()
+        print("─" * (30 + col_w * len(numeric_cols)))
+
+        for stat in stat_keys:
+            print(f"{stat:<30}", end="")
+            for col in numeric_cols:
+                val = profile["columns"][col][stat]
+                cell = f"{val:>{col_w}.2f}" if val is not None else f"{'—':>{col_w}}"
+                print(cell, end="")
+            print()
+
+    # ── Datetime columns note ──────────────────────────────────────────────
+    if profile["datetime_cols"]:
+        print(f"\nDatetime columns detected: {', '.join(profile['datetime_cols'])}")
