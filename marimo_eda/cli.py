@@ -106,6 +106,14 @@ def _prompt_correlation(df: pd.DataFrame) -> dict | None:
     if len(numeric_cols) < 2:
         questionary.print("Need at least 2 numeric columns for a correlation heatmap.", style="fg:yellow")
         return None
+    
+    selected_cols = questionary.checkbox(
+        "Select columns to include (space to select, enter to confirm):",
+        choices=numeric_cols,
+        validate=lambda x: True if len(x) >= 2 else "Please select at least 2 columns.",
+    ).ask()
+    if not selected_cols or len(selected_cols) < 2:
+        return None
 
     method = questionary.select(
         "Correlation method:",
@@ -114,7 +122,7 @@ def _prompt_correlation(df: pd.DataFrame) -> dict | None:
     if method is None:
         return None
 
-    return {"type": "correlation", "method": method}
+    return {"type": "correlation", "method": method, "columns": selected_cols}
 
 
 def _prompt_timeseries(df: pd.DataFrame) -> dict | None:
@@ -218,7 +226,10 @@ def _describe_spec(spec: dict) -> str:
     if t == "bivariate":
         return f"{spec['chart']} — `{spec['x']}` vs `{spec['y']}`"
     if t == "correlation":
-        return f"Correlation Heatmap ({spec['method']})"
+        cols_preview = ", ".join(spec["columns"][:3])
+        if len(spec["columns"]) > 3:
+            cols_preview += f" +{len(spec['columns']) - 3} more"
+        return f"Correlation Heatmap ({spec['method']}) — {cols_preview}"
     if t == "timeseries":
         color_note = f" grouped by `{spec['color']}`" if spec["color"] != "None" else ""
         return f"Line Plot — `{spec['x']}` vs `{spec['y']}`{color_note}"
