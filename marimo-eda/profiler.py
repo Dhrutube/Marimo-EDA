@@ -32,3 +32,27 @@ def _try_parse_datetime(df: pd.DataFrame) -> pd.DataFrame:
             except (ValueError, TypeError):
                 pass
     return df
+
+def profile_csv(path: pathlib.Path) -> dict:
+    """
+    Load a CSV and return yprofile-data
+
+    Raises:
+        ValueError: if the file is empty or has no columns.
+        pd.errors.ParserError: if the file cannot be parsed as CSV.
+    """
+    # Load
+    df = pd.read_csv(path)
+
+    if df.empty:
+        raise ValueError("The CSV file is empty.")
+    if len(df.columns) == 0:
+        raise ValueError("The CSV file has no columns.")
+
+    # Try to detect datetime columns from object columns
+    df = _try_parse_datetime(df)
+
+    # Run ydata in minimal mode — fast, just stats, no HTML
+    report = ProfileReport(df, minimal=True, progress_bar=False)
+    description = report.get_description()
+    ydata_vars = description.variables  # dict[col_name, dict of stats]
