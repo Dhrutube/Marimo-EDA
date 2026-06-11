@@ -52,7 +52,69 @@ def profile_csv(path: pathlib.Path) -> dict:
     # Try to detect datetime columns from object columns
     df = _try_parse_datetime(df)
 
-    # Run ydata in minimal mode — fast, just stats, no HTML
+    # Run ydata
     report = ProfileReport(df, minimal=True, progress_bar=False)
     description = report.get_description()
     ydata_vars = description.variables  # dict[col_name, dict of stats]
+
+    # Build per-column summaries
+    columns: dict[str, dict] = {}
+    for col in df.columns:
+        series = df[col]
+        kind = _col_kind(series)
+        yv = ydata_vars.get(col, {})
+
+        entry: dict = {
+            "dtype":      str(series.dtype),
+            "kind":       kind,
+            "non_null":   int(series.notna().sum()),
+            "null_count": int(series.isna().sum()),
+            "null_pct":   round(series.isna().mean() * 100, 1),
+            "unique":     int(series.nunique(dropna=True)),
+            # numeric fields — filled below if applicable
+            "mean":       None,
+            "std":        None,
+            "min":        None,
+            "p25":        None,
+            "p50":        None,
+            "p75":        None,
+            "max":        None,
+            # categorical fields — filled below if applicable
+            "top_values": {},
+        }
+
+        if kind == "numeric":
+            entry["mean"] = _safe_float(yv.get("mean"))
+            entry["std"]  = _safe_float(yv.get("std"))
+            entry["min"]  = _safe_float(yv.get("min"))
+            entry["p25"]  = _safe_float(yv.get("p25"))
+            entry["p50"]  = _safe_float(yv.get("p50"))
+            entry["p75"]  = _safe_float(yv.get("p75"))
+            entry["max"]  = _safe_float(yv.get("max"))
+
+        if kind == "categorical":
+            top = series.dropna().value_counts().head(10)
+            entry["top_values"] = {str(k): int(v) for k, v in top.items()}
+
+        columns[col] = entry
+
+    numeric_cols     = [c for c, m in columns.items() if m["kind"] == "numeric"]
+    categorical_cols = [c for c, m in columns.items() if m["kind"] == "categorical"]
+    datetime_cols    = [c for c, m in columns.items() if m["kind"] == "datetime"]
+
+    return {
+        "df":               df,
+        "shape":            df.shape,
+        "duplicates":       int(df.duplicated().sum()),
+        "columns":          columns,
+        "numeric_cols":     numeric_cols,
+        "categorical_cols": categorical_cols,
+        "datetime_cols":    datetime_cols,
+    }
+
+def _safe_float(value: object) -> float | None:
+    """Safety wrapper for converting ydata's stat values to floats, since DataFrame has 'object' type."""
+    try:
+        return round(float(value), 4)  # type: ignore[arg-type]
+    except (TypeError, ValueError):
+        return None
