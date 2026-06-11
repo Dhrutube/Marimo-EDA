@@ -1,3 +1,7 @@
+"""
+The command-line interface for user interactivity.
+"""
+
 import sys
 import pathlib
 
@@ -17,9 +21,9 @@ MAIN_MENU_CHOICES = [
     "Done — generate notebook",
 ]
 
-UNIVARIATE_NUMERIC_CHARTS = ["Histogram", "Box Plot", "Strip Plot", "Line Plot (over index)"]
+UNIVARIATE_NUMERIC_CHARTS = ["Histogram", "Box Plot", "Strip Plot"]
 UNIVARIATE_CATEGORICAL_CHARTS = ["Bar Chart (counts)", "Pie Chart"]
-BIVARIATE_CHARTS = ["Scatter Plot", "Grouped Bar Chart", "Line Plot"]
+BIVARIATE_CHARTS = ["Scatter Plot", "Grouped Bar Chart"]
 CORRELATION_METHODS = ["pearson", "spearman", "kendall"]
 
 def _is_numeric(df: pd.DataFrame, col: str) -> bool:
@@ -314,7 +318,7 @@ def main() -> None:
     print(f"\nNotebook written to {output_path}")
     print("\nTo open your notebook run:")
     print(f"   marimo edit {output_path}\n")
-    print("\nTo open your report run:")
+    print("To open your report run:")
     print(f"   marimo run {output_path}\n")
     print("Dependencies needed in that environment:")
     print("   pip install marimo pandas altair\n")

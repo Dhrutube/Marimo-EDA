@@ -1,3 +1,7 @@
+"""
+Profiler for loading .csv and computing summary profiles.
+"""
+
 import pathlib
 
 import pandas as pd
