@@ -4,7 +4,7 @@ import pandas as pd
 from ydata_profiling import ProfileReport
 
 
-# ── Column kind detection ─────────────────────────────────────────────────────
+# Column kind detection and parsing
 
 def _col_kind(series: pd.Series) -> str:
     if pd.api.types.is_numeric_dtype(series):
