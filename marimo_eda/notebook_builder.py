@@ -33,3 +33,39 @@ _FILE_FOOTER = '''\
 if __name__ == "__main__":
     app.run()
 '''
+
+# Cell builder
+
+def _render_cell(spec: dict) -> str:
+    """Route an analysis spec to the correct cell template function."""
+    t = spec["type"]
+
+    if t == "univariate":
+        return univariate_cell(
+            column=spec["column"],
+            chart=spec["chart"],
+        )
+    if t == "bivariate":
+        return bivariate_cell(
+            x=spec["x"],
+            y=spec["y"],
+            color=spec["color"],
+            chart=spec["chart"],
+        )
+    if t == "timeseries":
+        return timeseries_cell(
+            x=spec["x"],
+            y=spec["y"],
+            color=spec["color"],
+        )
+    if t == "missing":
+        return missing_heatmap_cell()
+    if t == "correlation":
+        return correlation_cell(method=spec["method"])
+
+    # Unknown spec type — emit a comment cell so the notebook still runs
+    return f'''\
+@app.cell
+def __(mo):
+    mo.md("> Unknown analysis type: `{t}` — skipped.")
+'''
