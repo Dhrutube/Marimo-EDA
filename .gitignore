@@ -1,3 +1,4 @@
 .venv
 marimo_eda/__pycache__/
+marimo_eda/cells/__pycache__/
 marimo_eda.egg-info/
