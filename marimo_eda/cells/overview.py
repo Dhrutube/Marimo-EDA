@@ -1,3 +1,8 @@
+"""
+cells/overview.py — always-included notebook cells.
+Every generated notebook starts with these cells regardless of what user picked.
+"""
+
 import pathlib
  
  
@@ -65,6 +70,14 @@ def __(df, mo):
 '''
  
  
+def describe_cell() -> str:
+    return '''\
+@app.cell
+def __(df, mo):
+    mo.md("## Descriptive Statistics")
+    return
+ 
+ 
 @app.cell
 def __(df, mo):
     import pandas as pd
@@ -93,7 +106,7 @@ def __(df, mo):
     })
     missing = missing[missing["null_count"] > 0].reset_index(drop=True)
     if missing.empty:
-        mo.callout(mo.md("No missing values found in this dataset."), kind="success")
+        mo.callout(mo.md("✅ No missing values found in this dataset."), kind="success")
     else:
         mo.table(missing)
     return (missing,)
