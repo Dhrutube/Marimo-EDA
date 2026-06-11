@@ -106,7 +106,7 @@ def __(df, mo):
     })
     missing = missing[missing["null_count"] > 0].reset_index(drop=True)
     if missing.empty:
-        mo.callout(mo.md("✅ No missing values found in this dataset."), kind="success")
+        mo.callout(mo.md("No missing values found in this dataset."), kind="success")
     else:
         mo.table(missing)
     return (missing,)
