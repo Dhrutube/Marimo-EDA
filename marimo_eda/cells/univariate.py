@@ -2,12 +2,13 @@
 cells/univariate.py — single-column chart cells.
 
 Supported chart types:
-  Histogram              (numeric)
-  Box Plot               (numeric)
-  Strip Plot             (numeric)
-  Line Plot (over index) (numeric)
-  Bar Chart (counts)     (categorical)
-  Pie Chart              (categorical)
+  Histogram              (numeric)  — sampled, distribution shape preserved
+  Box Plot               (numeric)  — sampled, quartiles stable
+  Strip Plot             (numeric)  — sampled, point density preserved
+  Line Plot (over index) (numeric)  — NOT sampled, full sequence required
+  Bar Chart (counts)     (categorical) — NOT sampled, aggregates on full df
+  Pie Chart              (categorical) — NOT sampled, aggregates on full df
+  sampling because output is too large for marimo
 """
 
 def univariate_cell(column: str, chart: str) -> str:
@@ -41,14 +42,16 @@ def __(mo):
 
 
 @app.cell
+@app.cell
 def __(df, alt, bin_count_{_safe(column)}):
-    chart = alt.Chart(df).mark_bar().encode(
+    _df_plot = df.sample(min(5000, len(df)), random_state=42) if len(df) > 5000 else df
+    _chart = alt.Chart(_df_plot).mark_bar().encode(
         alt.X("{column}:Q", bin=alt.Bin(maxbins=bin_count_{_safe(column)}.value), title="{column}"),
         alt.Y("count()", title="Count"),
         tooltip=[alt.Tooltip("{column}:Q"), alt.Tooltip("count()", title="Count")],
     ).properties(title="Histogram of {column}", width=500)
-    chart
-    return (chart,)
+    _chart
+    return
 '''
 
 
@@ -62,12 +65,13 @@ def __(mo):
 
 @app.cell
 def __(df, alt):
-    chart = alt.Chart(df).mark_boxplot(extent="min-max").encode(
+    _df_plot = df.sample(min(5000, len(df)), random_state=42) if len(df) > 5000 else df
+    _chart = alt.Chart(_df_plot).mark_boxplot(extent="min-max").encode(
         alt.Y("{column}:Q", title="{column}"),
         tooltip=[alt.Tooltip("{column}:Q")],
     ).properties(title="Box Plot of {column}", width=200)
-    chart
-    return (chart,)
+    _chart
+    return
 '''
 
 
@@ -81,16 +85,18 @@ def __(mo):
 
 @app.cell
 def __(df, alt):
-    chart = alt.Chart(df).mark_tick().encode(
+    _df_plot = df.sample(min(5000, len(df)), random_state=42) if len(df) > 5000 else df
+    _chart = alt.Chart(_df_plot).mark_tick().encode(
         alt.X("{column}:Q", title="{column}"),
         tooltip=[alt.Tooltip("{column}:Q")],
     ).properties(title="Strip Plot of {column}", width=500)
-    chart
-    return (chart,)
+    _chart
+    return
 '''
 
 
 def _line_plot_index(column: str) -> str:
+    # NOT sampled — full sequence needed for accurate line
     return f'''\
 @app.cell
 def __(mo):
@@ -100,14 +106,14 @@ def __(mo):
 
 @app.cell
 def __(df, alt):
-    _df = df[["{column}"]].reset_index().rename(columns={{"index": "row"}})
-    chart = alt.Chart(_df).mark_line().encode(
+    _df_plot = df[["{column}"]].reset_index().rename(columns={{"index": "row"}})
+    _chart = alt.Chart(_df_plot).mark_line().encode(
         alt.X("row:Q", title="Row index"),
         alt.Y("{column}:Q", title="{column}"),
         tooltip=[alt.Tooltip("row:Q", title="Index"), alt.Tooltip("{column}:Q")],
     ).properties(title="{column} over row index", width=500)
-    chart
-    return (chart,)
+    _chart
+    return
 '''
 
 
@@ -123,15 +129,15 @@ def __(mo):
 
 @app.cell
 def __(df, alt):
-    counts = df["{column}"].value_counts().reset_index()
-    counts.columns = ["{column}", "count"]
-    chart = alt.Chart(counts).mark_bar().encode(
+    _counts = df["{column}"].value_counts().reset_index()
+    _counts.columns = ["{column}", "count"]
+    _chart = alt.Chart(_counts).mark_bar().encode(
         alt.X("{column}:N", sort="-y", title="{column}"),
         alt.Y("count:Q", title="Count"),
         tooltip=[alt.Tooltip("{column}:N"), alt.Tooltip("count:Q", title="Count")],
     ).properties(title="Value Counts: {column}", width=500)
-    chart
-    return (chart,)
+    _chart
+    return
 '''
 
 
@@ -145,15 +151,15 @@ def __(mo):
 
 @app.cell
 def __(df, alt):
-    counts = df["{column}"].value_counts().reset_index()
-    counts.columns = ["{column}", "count"]
-    chart = alt.Chart(counts).mark_arc().encode(
+    _counts = df["{column}"].value_counts().reset_index()
+    _counts.columns = ["{column}", "count"]
+    _chart = alt.Chart(_counts).mark_arc().encode(
         theta=alt.Theta("count:Q"),
         color=alt.Color("{column}:N", legend=alt.Legend(title="{column}")),
         tooltip=[alt.Tooltip("{column}:N"), alt.Tooltip("count:Q", title="Count")],
     ).properties(title="Pie Chart: {column}", width=350, height=350)
-    chart
-    return (chart,)
+    _chart
+    return
 '''
 
 

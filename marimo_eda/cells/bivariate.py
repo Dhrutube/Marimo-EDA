@@ -2,9 +2,10 @@
 cells/bivariate.py — two-column chart cells.
 
 Supported chart types:
-  Scatter Plot
-  Grouped Bar Chart
-  Line Plot
+  Scatter Plot      — sampled, density patterns preserved
+  Grouped Bar Chart — NOT sampled, aggregates on full df
+  Line Plot         — NOT sampled, full sequence needed for accurate line
+  sampling because output is too large for marimo
 """
 
 def bivariate_cell(x: str, y: str, color: str, chart: str) -> str:
@@ -33,22 +34,24 @@ def __(mo):
 
 @app.cell
 def __(df, alt):
-    _chart = alt.Chart(df).mark_point(opacity=0.6).encode(
+    _df_plot = df.sample(min(5000, len(df)), random_state=42) if len(df) > 5000 else df
+    _chart = alt.Chart(_df_plot).mark_point(opacity=0.6).encode(
         alt.X("{x}:Q", title="{x}"),
         alt.Y("{y}:Q", title="{y}"),
         color={color_enc},
         tooltip=[alt.Tooltip("{x}:Q"), alt.Tooltip("{y}:Q"){color_tooltip}],
     ).interactive().properties(title="{title}", width=500)
     _chart
-    return (_chart,)
+    return
 '''
 
 
 def _grouped_bar(x: str, y: str, color: str) -> str:
+    # NOT sampled — aggregates on full df before passing to altair
     color_enc = f'alt.Color("{color}:N", legend=alt.Legend(title="{color}"))' if color != "None" else 'alt.value("steelblue")'
     x_offset = f'xOffset="{color}:N",' if color != "None" else ""
     title = f"{y} by {x}" + (f" grouped by {color}" if color != "None" else "")
-
+ 
     return f'''\
 @app.cell
 def __(mo):
@@ -58,15 +61,16 @@ def __(mo):
 
 @app.cell
 def __(df, alt):
-    _chart = alt.Chart(df).mark_bar().encode(
+    _agg = df.groupby("{x}")["{y}"].mean().reset_index()
+    _chart = alt.Chart(_agg).mark_bar().encode(
         alt.X("{x}:N", title="{x}"),
-        alt.Y("{y}:Q", title="{y}"),
+        alt.Y("{y}:Q", title="Mean {y}"),
         {x_offset}
         color={color_enc},
-        tooltip=[alt.Tooltip("{x}:N"), alt.Tooltip("{y}:Q")],
+        tooltip=[alt.Tooltip("{x}:N"), alt.Tooltip("{y}:Q", format=".2f", title="Mean {y}")],
     ).properties(title="{title}", width=500)
     _chart
-    return (_chart,)
+    return
 '''
 
 
@@ -85,14 +89,15 @@ def __(mo):
 
 @app.cell
 def __(df, alt):
-    _chart = alt.Chart(df).mark_line().encode(
-        alt.X("{x}:{x_type}", title="{x}"),
+    _df_plot = df[["{x}", "{y}"]].dropna().sort_values("{x}")
+    _chart = alt.Chart(_df_plot).mark_line().encode(
+        alt.X("{x}:Q", title="{x}"),
         alt.Y("{y}:Q", title="{y}"),
         color={color_enc},
-        tooltip=[alt.Tooltip("{x}:{x_type}"), alt.Tooltip("{y}:Q"){color_tooltip}],
+        tooltip=[alt.Tooltip("{x}:Q"), alt.Tooltip("{y}:Q"){color_tooltip}],
     ).interactive().properties(title="{title}", width=500)
     _chart
-    return (_chart,)
+    return
 '''
 
 
