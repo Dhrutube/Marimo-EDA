@@ -1,8 +1,12 @@
 """
-cells/correlation.py — correlation heatmap cell.
+cells/correlation.py — correlation heatmap cell with value labels.
 """
 
-def correlation_cell(method: str) -> str:
+from __future__ import annotations
+
+
+def correlation_cell(method: str, columns: list[str]) -> str:
+    cols_repr = repr(columns)
     return f'''\
 @app.cell
 def __(mo):
@@ -11,11 +15,14 @@ def __(mo):
 
 
 @app.cell
-def __(df, mo, alt):
-    corr = df.corr(numeric_only=True, method="{method}").stack().reset_index()
+def __(df, alt):
+    _cols = {cols_repr}
+    corr = df[_cols].corr(numeric_only=True, method="{method}").stack().reset_index()
     corr.columns = ["col1", "col2", "r"]
 
-    _chart = alt.Chart(corr).mark_rect().encode(
+    _base = alt.Chart(corr)
+
+    _heatmap = _base.mark_rect().encode(
         x=alt.X("col1:N", title=None),
         y=alt.Y("col2:N", title=None),
         color=alt.Color(
@@ -26,13 +33,25 @@ def __(df, mo, alt):
         tooltip=[
             alt.Tooltip("col1:N", title="Column A"),
             alt.Tooltip("col2:N", title="Column B"),
-            alt.Tooltip("r:Q", format=".3f", title="{method.capitalize()} r"),
+            alt.Tooltip("r:Q", format=".3f", title="{method} r"),
         ],
-    ).properties(
+    )
+
+    _text = _base.mark_text(fontSize=11).encode(
+        x=alt.X("col1:N"),
+        y=alt.Y("col2:N"),
+        text=alt.Text("r:Q", format=".2f"),
+        color=alt.condition(
+            "datum.r > 0.5 || datum.r < -0.5",
+            alt.value("white"),
+            alt.value("black"),
+        ),
+    )
+
+    (_heatmap + _text).properties(
         title="{method.capitalize()} Correlation Matrix",
         width=400,
         height=400,
     )
-    _chart
     return (corr,)
 '''
