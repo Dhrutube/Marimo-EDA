@@ -22,11 +22,11 @@ Open the generated report:
     marimo run path/to/output.py
 
 Types of analyses available:
-Univariate  - Histogram, Box Plot, Strip Plot, Bar Chart (counts), Pie Chart
-Bivariate   - Scatter Plot, Grouped Bar Chart
-Time Series - Line Plot (aggregated by X axis)
-Missing     - Bar chart of % missing per column
-Correlation - Heatmap with value labels (pearson / spearman / kendall)
+* Univariate  - Histogram, Box Plot, Strip Plot, Bar Chart (counts), Pie Chart
+* Bivariate   - Scatter Plot, Grouped Bar Chart
+* Time Series - Line Plot (aggregated by X axis)
+* Missing     - Bar chart of % missing per column
+* Correlation - Heatmap with value labels (pearson / spearman / kendall)
 
 ### Example session
 
