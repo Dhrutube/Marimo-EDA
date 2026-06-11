@@ -13,7 +13,7 @@ def __():
     import marimo as mo
     import pandas as pd
     import altair as alt
-    alt.data_transformers.enable("vegafusion")
+    alt.data_transformers.enable("default", max_rows=None)
     return mo, pd, alt
 '''
  
