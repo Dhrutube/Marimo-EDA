@@ -24,3 +24,10 @@ CORRELATION_METHODS = ["pearson", "spearman", "kendall"]
 
 def _is_numeric(df: pd.DataFrame, col: str) -> bool:
     return pd.api.types.is_numeric_dtype(df[col])
+
+def _pick_column(df: pd.DataFrame, label: str = "Select a column:") -> str | None:
+    return questionary.select(
+        label,
+        choices=list(df.columns),
+    ).ask()
+
