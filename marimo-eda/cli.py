@@ -114,3 +114,53 @@ def _prompt_correlation(df: pd.DataFrame) -> dict | None:
 
     return {"type": "correlation", "method": method}
 
+def _prompt_timeseries(df: pd.DataFrame) -> dict | None:
+    """
+    Prompt for a datetime X axis and one or more numeric Y columns.
+    If no datetime columns exist, fall back to letting the user pick any column
+    as X.
+    """
+    datetime_cols = df.select_dtypes("datetime").columns.tolist()
+    numeric_cols = df.select_dtypes("number").columns.tolist()
+
+    if not numeric_cols:
+        questionary.print("No numeric columns available for a time series plot.", style="fg:yellow")
+        return None
+
+    # X axis — prefer datetime columns but allow any column
+    if datetime_cols:
+        x_choices = datetime_cols + questionary.Separator() + [c for c in df.columns if c not in datetime_cols]
+    else:
+        questionary.print(
+            "No datetime columns detected. You can still pick any column as the time axis "
+            "(e.g. a year, month, or sequence column).",
+            style="fg:cyan",
+        )
+        x_choices = list(df.columns)
+
+    x_col = questionary.select("Time (X) axis column:", choices=x_choices).ask()
+    if x_col is None:
+        return None
+
+    y_col = questionary.select(
+        "Value (Y) axis column (numeric):",
+        choices=numeric_cols,
+    ).ask()
+    if y_col is None:
+        return None
+
+    # Optional color grouping
+    cat_cols = [c for c in df.select_dtypes("object").columns if c != x_col]
+    color_col = questionary.select(
+        "Color / group by (optional):",
+        choices=["None"] + cat_cols,
+    ).ask()
+    if color_col is None:
+        return None
+
+    return {
+        "type": "timeseries",
+        "x": x_col,
+        "y": y_col,
+        "color": color_col,
+    }
