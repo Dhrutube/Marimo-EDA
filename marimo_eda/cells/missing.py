@@ -20,6 +20,6 @@ def __(df, mo, pd):
     })
     _missing = _missing[_missing["null_count"] > 0].reset_index(drop=True)
 
-    mo.stop(_missing.empty, mo.callout(mo.md("✅ No missing values found in this dataset."), kind="success"))
+    mo.stop(_missing.empty, mo.callout(mo.md("No missing values found in this dataset."), kind="success"))
     _missing
 '''
