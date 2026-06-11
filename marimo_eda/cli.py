@@ -208,6 +208,23 @@ def _prompt_run(df: pd.DataFrame) -> list[dict]:
     return analyses
 
 
+def _describe_spec(spec: dict) -> str:
+    """Human-readable label for a spec, shown after adding it."""
+    t = spec["type"]
+    if t == "univariate":
+        return f"{spec['chart']} of `{spec['column']}`"
+    if t == "bivariate":
+        return f"{spec['chart']} — `{spec['x']}` vs `{spec['y']}`"
+    if t == "correlation":
+        return f"Correlation Heatmap ({spec['method']})"
+    if t == "timeseries":
+        color_note = f" grouped by `{spec['color']}`" if spec["color"] != "None" else ""
+        return f"Line Plot — `{spec['x']}` vs `{spec['y']}`{color_note}"
+    if t == "missing":
+        return {"type": "missing"}
+    return t
+
+
 # Let user decide path
 def _ask_output_path(csv_path: pathlib.Path) -> pathlib.Path:
     """Ask where to save the notebook."""
