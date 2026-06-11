@@ -24,7 +24,7 @@ _FILE_HEADER = '''\
 import marimo
 
 __generated_with = "0.7.0"
-app = marimo.App(title="EDA — {title}")
+app = marimo.App(title="EDA — {title}", auto_download=True)
 
 '''
 

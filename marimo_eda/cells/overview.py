@@ -65,7 +65,7 @@ def __(df, mo):
     dtypes_df = df.dtypes.reset_index()
     dtypes_df.columns = ["column", "dtype"]
     dtypes_df["dtype"] = dtypes_df["dtype"].astype(str)
-    mo.table(dtypes_df)
+    mo.ui.table(dtypes_df)
     return (dtypes_df,)
 '''
  
@@ -82,7 +82,7 @@ def __(df, mo):
 def __(df, mo):
     desc = df.describe(include="all").reset_index()
     desc = desc.rename(columns={"index": "stat"})
-    mo.table(desc)
+    mo.ui.table(desc)
     return (desc,)
 '''
  
@@ -106,6 +106,6 @@ def __(df, mo):
     if missing.empty:
         mo.callout(mo.md("No missing values found in this dataset."), kind="success")
     else:
-        mo.table(missing)
+        mo.ui.table(missing)
     return (missing,)
 '''
