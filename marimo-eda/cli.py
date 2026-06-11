@@ -202,3 +202,57 @@ def _prompt_run(df: pd.DataFrame) -> list[dict]:
         print()
 
     return analyses
+
+def main() -> None:
+    # Parse argument
+    if len(sys.argv) < 2:
+        print("Usage: marimo-eda <path-to-csv>")
+        sys.exit(1)
+
+    csv_path = pathlib.Path(sys.argv[1])
+
+    if not csv_path.exists():
+        print(f"Error: file not found — {csv_path}")
+        sys.exit(1)
+
+    if csv_path.suffix.lower() != ".csv":
+        print(f"Error: expected a .csv file, got `{csv_path.suffix}`")
+        sys.exit(1)
+
+    # Load profile
+    print(f"\nLoading {csv_path.name}...\n")
+    try:
+        profile = profile_csv(csv_path)
+    except Exception as exc:
+        print(f"Error reading CSV: {exc}")
+        sys.exit(1)
+
+    print_summary(profile)
+    print()
+
+    # Run Main Menu
+    df: pd.DataFrame = profile["df"]
+
+    analyses = _prompt_run(df)
+
+    if not analyses:
+        print("No analyses selected — nothing to write. Exiting.")
+        sys.exit(0)
+
+    print()
+    output_path = '~/Downloads'
+
+    # Build and export Marimo notebook
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    notebook_code = build_notebook(
+        csv_path=csv_path,
+        profile=profile,
+        analyses=analyses,
+    )
+    output_path.write_text(notebook_code, encoding="utf-8")
+
+    print(f"\nNotebook written to {output_path}")
+    print("\nTo open your notebook run:")
+    print(f"   marimo edit {output_path}\n")
+    print("Dependencies needed in that environment:")
+    print("   pip install marimo pandas altair ydata-profiling\n")
