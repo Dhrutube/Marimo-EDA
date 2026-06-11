@@ -240,7 +240,7 @@ def main() -> None:
         sys.exit(0)
 
     print()
-    output_path = pathlib.Path(str(pathlib.Path.home() / "Downloads")).expanduser() / csv_path.stem + "_eda.py"
+    output_path = pathlib.Path.home() / "Downloads" / (csv_path.stem + "_eda.py")
 
     # Build and export Marimo notebook
     output_path.parent.mkdir(parents=True, exist_ok=True)
