@@ -47,11 +47,10 @@ def __(df, alt):
 
 
 def _grouped_bar(x: str, y: str, color: str) -> str:
-    # NOT sampled — aggregates on full df before passing to altair
     color_enc = f'alt.Color("{color}:N", legend=alt.Legend(title="{color}"))' if color != "None" else 'alt.value("steelblue")'
     x_offset = f'xOffset="{color}:N",' if color != "None" else ""
-    title = f"{y} by {x}" + (f" grouped by {color}" if color != "None" else "")
- 
+    title = f"Mean {y} by {x}" + (f" grouped by {color}" if color != "None" else "")
+
     return f'''\
 @app.cell
 def __(mo):
@@ -61,14 +60,19 @@ def __(mo):
 
 @app.cell
 def __(df, alt):
+    # Aggregate — mean of Y per X group
     _agg = df.groupby("{x}")["{y}"].mean().reset_index()
+
+    # Keep top 50 X values by mean Y to avoid altair row limit
+    _agg = _agg.nlargest(50, "{y}")
+
     _chart = alt.Chart(_agg).mark_bar().encode(
-        alt.X("{x}:N", title="{x}"),
+        alt.X("{x}:N", sort="-y", title="{x}"),
         alt.Y("{y}:Q", title="Mean {y}"),
         {x_offset}
         color={color_enc},
         tooltip=[alt.Tooltip("{x}:N"), alt.Tooltip("{y}:Q", format=".2f", title="Mean {y}")],
-    ).properties(title="{title}", width=500)
+    ).properties(title="{title} (top 50)", width=500)
     _chart
     return
 '''
