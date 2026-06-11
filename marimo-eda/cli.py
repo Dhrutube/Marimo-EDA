@@ -97,3 +97,20 @@ def _prompt_bivariate(df: pd.DataFrame) -> dict | None:
         "y": y_col,
         "color": color_col,
     }
+
+def _prompt_correlation(df: pd.DataFrame) -> dict | None:
+    """Prompt for correlation."""
+    numeric_cols = df.select_dtypes("number").columns.tolist()
+    if len(numeric_cols) < 2:
+        questionary.print("Need at least 2 numeric columns for a correlation heatmap.", style="fg:yellow")
+        return None
+
+    method = questionary.select(
+        "Correlation method:",
+        choices=CORRELATION_METHODS,
+    ).ask()
+    if method is None:
+        return None
+
+    return {"type": "correlation", "method": method}
+
