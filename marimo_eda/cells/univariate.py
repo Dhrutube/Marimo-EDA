@@ -5,7 +5,6 @@ Supported chart types:
   Histogram              (numeric)  — sampled, distribution shape preserved
   Box Plot               (numeric)  — sampled, quartiles stable
   Strip Plot             (numeric)  — sampled, point density preserved
-  Line Plot (over index) (numeric)  — NOT sampled, full sequence required
   Bar Chart (counts)     (categorical) — NOT sampled, aggregates on full df
   Pie Chart              (categorical) — NOT sampled, aggregates on full df
   sampling because output is too large for marimo
@@ -16,7 +15,6 @@ def univariate_cell(column: str, chart: str) -> str:
         "Histogram":              _histogram,
         "Box Plot":               _box_plot,
         "Strip Plot":             _strip_plot,
-        "Line Plot (over index)": _line_plot_index,
         "Bar Chart (counts)":     _bar_chart,
         "Pie Chart":              _pie_chart,
     }
@@ -90,28 +88,6 @@ def __(df, alt):
         alt.X("{column}:Q", title="{column}"),
         tooltip=[alt.Tooltip("{column}:Q")],
     ).properties(title="Strip Plot of {column}", width=500)
-    _chart
-    return
-'''
-
-
-def _line_plot_index(column: str) -> str:
-    # NOT sampled — full sequence needed for accurate line
-    return f'''\
-@app.cell
-def __(mo):
-    mo.md("## Line Plot — `{column}` over index")
-    return
-
-
-@app.cell
-def __(df, alt):
-    _df_plot = df[["{column}"]].reset_index().rename(columns={{"index": "row"}})
-    _chart = alt.Chart(_df_plot).mark_line().encode(
-        alt.X("row:Q", title="Row index"),
-        alt.Y("{column}:Q", title="{column}"),
-        tooltip=[alt.Tooltip("row:Q", title="Index"), alt.Tooltip("{column}:Q")],
-    ).properties(title="{column} over row index", width=500)
     _chart
     return
 '''
