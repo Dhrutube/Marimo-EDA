@@ -69,3 +69,43 @@ def _render_cell(spec: dict) -> str:
 def __(mo):
     mo.md("> Unknown analysis type: `{t}` — skipped.")
 '''
+
+# Actual notebook builder
+def build_notebook(
+    csv_path: pathlib.Path,
+    profile: dict,
+    analyses: list[dict],
+) -> str:
+    """
+    Assemble and return the full marimo notebook source as a string.
+
+    Args:
+        csv_path:  Path to the original CSV (embedded in the loader cell).
+        profile:   The profile dict returned by profiler.profile_csv().
+        analyses:  The list of analysis specs built by the CLI wizard.
+
+    Returns:
+        A string of valid Python that can be saved as a .py file and
+        opened with `marimo edit`.
+    """
+    parts: list[str] = []
+
+    # ── File header ────────────────────────────────────────────────────────
+    parts.append(_FILE_HEADER.format(title=csv_path.name))
+
+    # ── Fixed overview cells (always present) ──────────────────────────────
+    parts.append(imports_cell())
+    parts.append(loader_cell(csv_path=csv_path))
+    parts.append(shape_cell(profile=profile))
+    parts.append(dtypes_cell())
+    parts.append(describe_cell())
+    parts.append(missing_summary_cell())
+
+    # ── User-selected analysis cells ───────────────────────────────────────
+    for spec in analyses:
+        parts.append(_render_cell(spec))
+
+    # ── File footer ────────────────────────────────────────────────────────
+    parts.append(_FILE_FOOTER)
+
+    return "\n".join(parts)
