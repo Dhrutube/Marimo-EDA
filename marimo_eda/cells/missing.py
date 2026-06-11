@@ -1,5 +1,5 @@
 """
-cells/missing.py — missing value heatmap cell.
+cells/missing.py — missing values cell.
 """
 
 
